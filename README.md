@@ -608,6 +608,397 @@
             }
         });
 
+        <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spin the Wheel Decision Maker</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #FDFBF7;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            padding: 1rem;
+        }
+        .container {
+            display: grid;
+            grid-template-areas:
+                "title title"
+                "controls wheel"
+                "options wheel";
+            grid-template-columns: 300px 1fr;
+            grid-template-rows: auto 1fr auto;
+            gap: 2rem;
+            max-width: 1000px;
+            width: 100%;
+        }
+        @media (max-width: 768px) {
+            .container {
+                grid-template-areas:
+                    "title"
+                    "wheel"
+                    "controls"
+                    "options";
+                grid-template-columns: 1fr;
+                grid-template-rows: auto;
+            }
+        }
+        .section-card {
+            background-color: white;
+            border-radius: 1.5rem;
+            padding: 1.5rem;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.04);
+            border: 1px solid #F0EFEA;
+        }
+        #wheelCanvas {
+            max-width: 500px;
+            width: 100%;
+            aspect-ratio: 1 / 1;
+        }
+        .pointer {
+            width: 0;
+            height: 0;
+            border-left: 20px solid transparent;
+            border-right: 20px solid transparent;
+            border-top: 30px solid #dc2626; /* red-600 */
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10;
+        }
+        /* Winner Modal Styles */
+        .modal-hidden {
+            display: none;
+        }
+        .modal-visible {
+            display: flex;
+        }
+        #modalContent {
+            animation: scaleUp 0.5s cubic-bezier(0.165, 0.840, 0.440, 1.000) forwards;
+        }
+        @keyframes scaleUp {
+            0% { transform: scale(0.8); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <div class="container">
+        <header style="grid-area: title;" class="text-center">
+            <h1 class="text-3xl md:text-4xl font-bold text-[#1A3A5A]">Spin the Wheel!</h1>
+            <p class="text-gray-500 mt-1">Add up to 10 options and find your winner.</p>
+        </header>
+
+        <div style="grid-area: controls;" class="section-card">
+            <h2 class="font-bold text-lg mb-4 text-center">Add Your Choices</h2>
+            <div class="flex space-x-2">
+                <input type="text" id="optionInput" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-[#1A3A5A] focus:ring-[#1A3A5A] sm:text-sm" placeholder="e.g., Movie Night">
+                <button id="addOptionBtn" class="bg-[#1A3A5A] text-white font-bold py-2 px-4 rounded-md hover:bg-[#1A3A5A]/90 transition-colors flex-shrink-0">Add</button>
+            </div>
+            <p id="error-message" class="text-red-500 text-sm mt-2 text-center"></p>
+        </div>
+
+        <div style="grid-area: options;" class="section-card">
+            <h2 class="font-bold text-lg mb-4 text-center">Current Options</h2>
+            <ul id="optionsList" class="space-y-2 text-sm">
+                <!-- Options will be dynamically added here -->
+            </ul>
+        </div>
+        
+        <div style="grid-area: wheel;" class="flex flex-col items-center justify-center space-y-4">
+             <div class="relative">
+                <div class="pointer"></div>
+                <canvas id="wheelCanvas" width="500" height="500"></canvas>
+            </div>
+            <button id="spinBtn" class="bg-[#8A9A5B] text-white text-xl font-bold py-3 px-10 rounded-full hover:bg-[#8A9A5B]/90 transition-colors shadow-lg disabled:bg-gray-400 disabled:cursor-not-allowed">SPIN</button>
+        </div>
+    </div>
+    
+    <!-- Winner Modal -->
+    <div id="winnerModal" class="fixed inset-0 bg-black bg-opacity-60 items-center justify-center z-50 modal-hidden">
+        <canvas id="confettiCanvas" class="absolute top-0 left-0 w-full h-full pointer-events-none"></canvas>
+        <div id="modalContent" class="bg-white p-8 rounded-2xl shadow-xl text-center transform transition-all max-w-sm w-full mx-4">
+            <p class="text-gray-500 text-lg">The winner is...</p>
+            <h2 id="winnerText" class="text-4xl font-bold text-[#1A3A5A] my-4 break-words"></h2>
+            <div class="space-y-3 mt-6">
+                <button id="removeWinnerBtn" class="bg-red-500 text-white font-bold py-2 px-6 rounded-lg w-full hover:bg-red-600 transition-colors">Remove & Spin Again</button>
+                <button id="keepWinnerBtn" class="bg-gray-300 text-gray-800 font-bold py-2 px-6 rounded-lg w-full hover:bg-gray-400 transition-colors">Keep & Close</button>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        const wheelCanvas = document.getElementById('wheelCanvas');
+        const ctx = wheelCanvas.getContext('2d');
+        const spinBtn = document.getElementById('spinBtn');
+        const optionInput = document.getElementById('optionInput');
+        const addOptionBtn = document.getElementById('addOptionBtn');
+        const optionsList = document.getElementById('optionsList');
+        const errorMessage = document.getElementById('error-message');
+
+        // Modal elements
+        const winnerModal = document.getElementById('winnerModal');
+        const winnerText = document.getElementById('winnerText');
+        const removeWinnerBtn = document.getElementById('removeWinnerBtn');
+        const keepWinnerBtn = document.getElementById('keepWinnerBtn');
+        
+        // Confetti elements
+        const confettiCanvas = document.getElementById('confettiCanvas');
+        const confettiCtx = confettiCanvas.getContext('2d');
+        let confettiAnimationId;
+
+        let options = [];
+        const colors = ['#1A3A5A', '#8A9A5B', '#FDFBF7', '#EAD3A2', '#5E7A4A', '#b3cde0', '#6497b1', '#005b96', '#03396c', '#011f4b'];
+        let startAngle = 0;
+        let arc = 0;
+        let spinTimeout = null;
+
+        let spinAngleStart = 0;
+        let spinTime = 0;
+        let spinTimeTotal = 0;
+        
+        let isSpinning = false;
+
+        function drawWheel() {
+            const numOptions = options.length;
+            if (numOptions === 0) {
+                 ctx.clearRect(0, 0, wheelCanvas.width, wheelCanvas.height);
+                 return;
+            }
+            arc = Math.PI * 2 / numOptions;
+            
+            ctx.clearRect(0, 0, wheelCanvas.width, wheelCanvas.height);
+            ctx.strokeStyle = '#ccc';
+            ctx.lineWidth = 2;
+            
+            ctx.font = 'bold 16px Poppins, sans-serif';
+
+            for (let i = 0; i < numOptions; i++) {
+                const angle = startAngle + i * arc;
+                ctx.fillStyle = colors[i % colors.length];
+
+                ctx.beginPath();
+                ctx.arc(250, 250, 250, angle, angle + arc, false);
+                ctx.arc(250, 250, 0, angle + arc, angle, true);
+                ctx.stroke();
+                ctx.fill();
+
+                ctx.save();
+                ctx.fillStyle = (i % 4 === 2) ? '#333' : 'white';
+                ctx.translate(250 + Math.cos(angle + arc / 2) * 180, 250 + Math.sin(angle + arc / 2) * 180);
+                ctx.rotate(angle + arc / 2 + Math.PI / 2);
+                const text = options[i];
+                const maxTextWidth = 120;
+                let displayText = text;
+                if(ctx.measureText(text).width > maxTextWidth) {
+                    while(ctx.measureText(displayText + '...').width > maxTextWidth && displayText.length > 0) {
+                        displayText = displayText.slice(0, -1);
+                    }
+                    displayText += '...';
+                }
+                ctx.fillText(displayText, -ctx.measureText(displayText).width / 2, 0);
+                ctx.restore();
+            }
+        }
+        
+        function updateOptionsList() {
+            optionsList.innerHTML = '';
+            if (options.length === 0) {
+                 optionsList.innerHTML = '<li class="text-gray-400 text-center">No options yet!</li>';
+            }
+            options.forEach((option, index) => {
+                const li = document.createElement('li');
+                li.className = 'flex justify-between items-center bg-gray-100 p-2 rounded-md';
+                li.textContent = option;
+                
+                const removeBtn = document.createElement('button');
+                removeBtn.innerHTML = '&times;';
+                removeBtn.className = 'font-bold text-red-500 hover:text-red-700 ml-2';
+                removeBtn.onclick = () => removeOption(index);
+                
+                li.appendChild(removeBtn);
+                optionsList.appendChild(li);
+            });
+            spinBtn.disabled = options.length < 2;
+        }
+
+        function addOption() {
+            const newOption = optionInput.value.trim();
+            errorMessage.textContent = '';
+
+            if (newOption) {
+                if (options.length >= 10) {
+                    errorMessage.textContent = 'Maximum of 10 options allowed.';
+                    return;
+                }
+                options.push(newOption);
+                optionInput.value = '';
+                updateOptionsList();
+                drawWheel();
+            }
+        }
+        
+        function removeOption(indexToRemove) {
+            options.splice(indexToRemove, 1);
+            updateOptionsList();
+            drawWheel();
+        }
+
+        function rotateWheel() {
+            spinTime += 30;
+            if (spinTime >= spinTimeTotal) {
+                stopRotateWheel();
+                return;
+            }
+            const spinAngle = spinAngleStart - easeOut(spinTime, 0, spinAngleStart, spinTimeTotal);
+            startAngle += (spinAngle * Math.PI / 180);
+            drawWheel();
+            spinTimeout = requestAnimationFrame(rotateWheel);
+        }
+
+        function stopRotateWheel() {
+            cancelAnimationFrame(spinTimeout);
+            const degrees = startAngle * 180 / Math.PI + 90;
+            const arcd = arc * 180 / Math.PI;
+            const winnerIndex = Math.floor((360 - degrees % 360) / arcd);
+            
+            showWinnerModal(options[winnerIndex], winnerIndex);
+        }
+
+        function easeOut(t, b, c, d) {
+            const ts = (t /= d) * t;
+            const tc = ts * t;
+            return b + c * (tc + -3 * ts + 3 * t);
+        }
+        
+        function spin() {
+            if (isSpinning || options.length < 2) return;
+            isSpinning = true;
+            spinBtn.disabled = true;
+
+            spinAngleStart = Math.random() * 10 + 10;
+            spinTime = 0;
+            spinTimeTotal = Math.random() * 3000 + 4000; // 4-7 seconds spin
+            rotateWheel();
+        }
+        
+        function showWinnerModal(winner, index) {
+            winnerText.textContent = winner;
+            winnerModal.classList.remove('modal-hidden');
+            winnerModal.classList.add('modal-visible');
+            startConfetti();
+
+            function handleRemove() {
+                removeOption(index);
+                cleanup();
+            }
+            function handleKeep() {
+                cleanup();
+            }
+            function cleanup() {
+                winnerModal.classList.add('modal-hidden');
+                winnerModal.classList.remove('modal-visible');
+                isSpinning = false;
+                spinBtn.disabled = options.length < 2;
+                stopConfetti();
+                removeWinnerBtn.removeEventListener('click', handleRemove);
+                keepWinnerBtn.removeEventListener('click', handleKeep);
+            }
+
+            removeWinnerBtn.addEventListener('click', handleRemove, { once: true });
+            keepWinnerBtn.addEventListener('click', handleKeep, { once: true });
+        }
+
+
+        // --- Confetti Logic ---
+        let particles = [];
+        function startConfetti() {
+            confettiCanvas.width = window.innerWidth;
+            confettiCanvas.height = window.innerHeight;
+            particles = [];
+            const particleCount = 200;
+            for (let i = 0; i < particleCount; i++) {
+                particles.push(new Particle());
+            }
+            confettiLoop();
+        }
+
+        function stopConfetti() {
+            particles = [];
+            cancelAnimationFrame(confettiAnimationId);
+        }
+
+        function confettiLoop() {
+            confettiAnimationId = requestAnimationFrame(confettiLoop);
+            confettiCtx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+
+            particles.forEach((particle, index) => {
+                particle.update();
+                particle.draw();
+                if (particle.y > confettiCanvas.height) {
+                    particles.splice(index, 1);
+                }
+            });
+        }
+        
+        class Particle {
+            constructor() {
+                this.x = Math.random() * confettiCanvas.width;
+                this.y = Math.random() * -confettiCanvas.height;
+                this.size = Math.random() * 10 + 5;
+                this.speed = Math.random() * 5 + 2;
+                this.gravity = 0.1;
+                this.color = colors[Math.floor(Math.random() * colors.length)];
+                this.opacity = 1;
+                this.angle = Math.random() * Math.PI * 2;
+                this.spin = (Math.random() - 0.5) * 0.2;
+            }
+            update() {
+                this.y += this.speed;
+                this.speed += this.gravity;
+                this.x += Math.sin(this.angle) * 2;
+                this.angle += this.spin;
+            }
+            draw() {
+                confettiCtx.save();
+                confettiCtx.fillStyle = this.color;
+                confettiCtx.globalAlpha = this.opacity;
+                confettiCtx.beginPath();
+                confettiCtx.rect(this.x, this.y, this.size, this.size);
+                confettiCtx.fill();
+                confettiCtx.restore();
+            }
+        }
+
+        addOptionBtn.addEventListener('click', addOption);
+        optionInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                addOption();
+            }
+        });
+        spinBtn.addEventListener('click', spin);
+
+        // Initial state
+        updateOptionsList();
+        drawWheel();
+    </script>
+</body>
+</html>
+
+
+
     </script>
 
 </body>
