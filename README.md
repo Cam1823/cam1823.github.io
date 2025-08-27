@@ -1,4 +1,3 @@
-
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -197,6 +196,28 @@
             transform: translateX(-50%);
             z-index: 10;
         }
+        .gemini-output {
+            background-color: #f7fafc;
+            border-left: 4px solid #1A3A5A;
+            padding: 1rem;
+            margin-top: 1rem;
+            border-radius: 0.5rem;
+            white-space: pre-wrap;
+            font-family: 'Lora', serif;
+        }
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #1A3A5A;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+            margin: 1rem auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body class="antialiased">
@@ -363,7 +384,7 @@
             </div>
         </section>
 
-        <!-- NEW Section: Weekly Calendar -->
+        <!-- Section: Weekly Calendar -->
         <section id="planner" class="section-card">
             <h2 class="text-2xl font-bold text-center mb-8">Our Weekly Planner</h2>
             <div id="add-event-form" class="mb-8 p-6 bg-gray-50 rounded-lg">
@@ -429,7 +450,7 @@
             </div>
         </section>
         
-        <!-- Section 5: Our "Flex Time" Fund -->
+        <!-- Section: Our "Flex Time" Fund -->
         <section id="flex-fund" class="section-card">
             <h2 class="text-2xl font-bold text-center mb-8">Our "Flex Time" Fund: Planning for the Unplanned</h2>
             <div class="grid md:grid-cols-2 gap-8 items-center">
@@ -464,7 +485,7 @@
             </div>
         </section>
 
-        <!-- Section 6: Our Year in Numbers -->
+        <!-- Section: Our Year in Numbers -->
         <section id="numbers" class="section-card bg-navy text-white text-center">
              <h2 class="text-2xl font-bold text-center mb-8">Our Year in Numbers</h2>
              <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -487,7 +508,7 @@
              </div>
         </section>
         
-        <!-- Section 7: Our Year Together: A Detailed Look -->
+        <!-- Section: Our Year Together: A Detailed Look -->
         <section id="year-together" class="section-card">
             <h2 class="text-2xl font-bold text-center mb-8">Our Year Together: A Detailed Look</h2>
             <div class="w-full max-w-sm mx-auto relative">
@@ -525,7 +546,7 @@
             </div>
         </section>
 
-        <!-- Section 8: Next Steps & To-Dos -->
+        <!-- Section: Next Steps & To-Dos -->
         <section id="todos" class="section-card">
             <h2 class="text-2xl font-bold text-center mb-8">Next Steps & To-Dos</h2>
             <div id="todo-list" class="space-y-4 max-w-md mx-auto">
@@ -537,22 +558,40 @@
                     <input id="todo2" type="checkbox" class="h-5 w-5 rounded border-gray-300 text-navy focus:ring-navy cursor-pointer">
                     <label for="todo2" class="ml-3 text-gray-700 select-none cursor-pointer transition-all duration-200">Decide on Wedding Scenario</label>
                 </div>
-                <div class="flex items-center">
-                    <input id="todo3" type="checkbox" class="h-5 w-5 rounded border-gray-300 text-navy focus:ring-navy cursor-pointer">
-                    <label for="todo3" class="ml-3 text-gray-700 select-none cursor-pointer transition-all duration-200">Plan a romantic getaway</label>
+                <!-- Gemini Feature: Getaway Planner -->
+                <div id="getaway-todo-item">
+                    <div class="flex items-center">
+                        <input id="todo3" type="checkbox" class="h-5 w-5 rounded border-gray-300 text-navy focus:ring-navy cursor-pointer">
+                        <label for="todo3" class="ml-3 text-gray-700 select-none cursor-pointer transition-all duration-200">Plan a romantic getaway</label>
+                    </div>
+                    <div id="getaway-planner" class="mt-4 ml-8 space-y-2">
+                        <input type="text" id="getaway-prompt" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-navy focus:ring-navy sm:text-sm" placeholder="e.g., A cozy cabin weekend in the mountains">
+                        <button id="get-getaway-btn" class="bg-sage text-white font-bold py-2 px-4 rounded-md hover:bg-sage/90 transition-colors w-full">✨ Get Getaway Ideas</button>
+                        <div id="getaway-loader" class="hidden spinner"></div>
+                        <div id="getaway-output" class="gemini-output hidden"></div>
+                    </div>
                 </div>
                 <div class="flex items-center">
                     <input id="todo4" type="checkbox" class="h-5 w-5 rounded border-gray-300 text-navy focus:ring-navy cursor-pointer">
                     <label for="todo4" class="ml-3 text-gray-700 select-none cursor-pointer transition-all duration-200">Look at puppies</label>
                 </div>
-                <div class="flex items-center">
-                    <input id="todo5" type="checkbox" class="h-5 w-5 rounded border-gray-300 text-navy focus:ring-navy cursor-pointer">
-                    <label for="todo5" class="ml-3 text-gray-700 select-none cursor-pointer transition-all duration-200">Pick meals for date nights</label>
+                <!-- Gemini Feature: Meal Planner -->
+                <div id="meal-todo-item">
+                    <div class="flex items-center">
+                        <input id="todo5" type="checkbox" class="h-5 w-5 rounded border-gray-300 text-navy focus:ring-navy cursor-pointer">
+                        <label for="todo5" class="ml-3 text-gray-700 select-none cursor-pointer transition-all duration-200">Pick meals for date nights</label>
+                    </div>
+                    <div id="meal-planner" class="mt-4 ml-8">
+                         <button id="get-meals-btn" class="bg-sage text-white font-bold py-2 px-4 rounded-md hover:bg-sage/90 transition-colors w-full">✨ Suggest Meal Ideas</button>
+                         <div id="meals-loader" class="hidden spinner"></div>
+                         <div id="meals-output" class="gemini-output hidden"></div>
+                    </div>
                 </div>
             </div>
+            <p class="text-xs text-center mt-6 text-gray-400">✨ AI features powered by Gemini</p>
         </section>
 
-        <!-- NEW Section: Spin the Wheel Decision Maker -->
+        <!-- Section: Spin the Wheel Decision Maker -->
         <section id="spinner" class="section-card">
             <h2 class="text-2xl font-bold text-center mb-1">Spin for Fun!</h2>
             <p class="text-center text-gray-500 mb-8">Can't decide on a date night? Let the wheel choose.</p>
@@ -733,14 +772,15 @@
 
         // To-Do List Logic
         const todoList = document.getElementById('todo-list');
+        
         todoList.addEventListener('change', function(event) {
-            if (event.target.type === 'checkbox') {
-                const label = event.target.nextElementSibling;
-                if (event.target.checked) {
-                    label.classList.add('line-through', 'text-gray-400');
-                } else {
-                    label.classList.remove('line-through', 'text-gray-400');
-                }
+            if (event.target.type !== 'checkbox') return;
+
+            const label = event.target.nextElementSibling;
+            if (event.target.checked) {
+                label.classList.add('line-through', 'text-gray-400');
+            } else {
+                label.classList.remove('line-through', 'text-gray-400');
             }
         });
 
@@ -758,7 +798,9 @@
             const eventType = eventTypeSelect.value;
 
             if (!eventName) {
-                alert('Please enter an event name.');
+                // Using a more subtle notification instead of alert()
+                eventNameInput.classList.add('border-red-500');
+                setTimeout(() => eventNameInput.classList.remove('border-red-500'), 2000);
                 return;
             }
 
@@ -778,7 +820,6 @@
             const dayColumn = document.getElementById(`calendar-${eventDay}`).querySelector('.p-2');
             dayColumn.appendChild(eventElement);
 
-            // Clear inputs
             eventNameInput.value = '';
         });
 
@@ -787,52 +828,131 @@
                 e.target.parentElement.remove();
             }
         });
+
+        // --- Gemini API Logic ---
+        const apiKey = ""; // Leave blank, will be handled by the environment
+
+        async function callGemini(systemPrompt, userQuery) {
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+            const payload = {
+                contents: [{ parts: [{ text: userQuery }] }],
+                systemInstruction: {
+                    parts: [{ text: systemPrompt }]
+                },
+            };
+
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) {
+                    throw new Error(`API call failed with status: ${response.status}`);
+                }
+
+                const result = await response.json();
+                const candidate = result.candidates?.[0];
+
+                if (candidate && candidate.content?.parts?.[0]?.text) {
+                    return candidate.content.parts[0].text;
+                } else {
+                    return "Sorry, I couldn't generate a response. Please try again.";
+                }
+            } catch (error) {
+                console.error("Gemini API call error:", error);
+                return "An error occurred while contacting the AI. Please check the console for details.";
+            }
+        }
+
+        // Meal Planner Feature
+        const getMealsBtn = document.getElementById('get-meals-btn');
+        const mealsLoader = document.getElementById('meals-loader');
+        const mealsOutput = document.getElementById('meals-output');
+
+        getMealsBtn.addEventListener('click', async () => {
+            mealsLoader.classList.remove('hidden');
+            mealsOutput.classList.add('hidden');
+            
+            const systemPrompt = "You are a creative chef specializing in romantic and fun at-home date night meals. Provide 5 unique, creative, and delicious meal ideas for a couple to cook together. For each idea, provide a catchy name and a brief, enticing description. The meals should range in difficulty but be achievable for home cooks. Present the output as a numbered list with markdown for bolding the names.";
+            const userQuery = "Suggest 5 date night meal ideas.";
+            
+            const responseText = await callGemini(systemPrompt, userQuery);
+            
+            mealsOutput.innerHTML = responseText.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>'); // Basic markdown for bold
+            mealsLoader.classList.add('hidden');
+            mealsOutput.classList.remove('hidden');
+        });
+        
+        // Getaway Planner Feature
+        const getGetawayBtn = document.getElementById('get-getaway-btn');
+        const getawayLoader = document.getElementById('getaway-loader');
+        const getawayOutput = document.getElementById('getaway-output');
+        const getawayPromptInput = document.getElementById('getaway-prompt');
+
+        getGetawayBtn.addEventListener('click', async () => {
+            const userQuery = getawayPromptInput.value.trim();
+            if (!userQuery) {
+                getawayPromptInput.classList.add('border-red-500');
+                setTimeout(() => getawayPromptInput.classList.remove('border-red-500'), 2000);
+                return;
+            }
+
+            getawayLoader.classList.remove('hidden');
+            getawayOutput.classList.add('hidden');
+
+            const systemPrompt = "You are a helpful travel agent who specializes in romantic getaways for couples. Based on the user's input, suggest a detailed itinerary for a romantic getaway. The itinerary should include a destination, accommodation suggestions (style, not specific hotels), 3-4 activities per day, and dining recommendations (type of cuisine/vibe). The getaway should be for 3 days and 2 nights. Use markdown for headings and bold text.";
+            
+            const responseText = await callGemini(systemPrompt, userQuery);
+            
+            // Basic markdown processing
+            let htmlResponse = responseText.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+            htmlResponse = htmlResponse.replace(/### (.*?)\n/g, '<h3 class="text-lg font-bold mt-4 mb-2">$1</h3>');
+            htmlResponse = htmlResponse.replace(/## (.*?)\n/g, '<h2 class="text-xl font-bold mt-6 mb-3">$1</h2>');
+            
+            getawayOutput.innerHTML = htmlResponse;
+            getawayLoader.classList.add('hidden');
+            getawayOutput.classList.remove('hidden');
+        });
         
         // --- Spin the Wheel Logic ---
         const wheelCanvas = document.getElementById('wheelCanvas');
-        const wheelCtx = wheelCanvas.getContext('2d'); // Renamed to avoid conflict
+        const wheelCtx = wheelCanvas.getContext('2d');
         const spinBtn = document.getElementById('spinBtn');
         const optionInput = document.getElementById('optionInput');
         const addOptionBtn = document.getElementById('addOptionBtn');
         const optionsList = document.getElementById('optionsList');
         const errorMessage = document.getElementById('error-message');
-
-        // Modal elements
         const winnerModal = document.getElementById('winnerModal');
         const winnerText = document.getElementById('winnerText');
         const removeWinnerBtn = document.getElementById('removeWinnerBtn');
         const keepWinnerBtn = document.getElementById('keepWinnerBtn');
-        
-        // Confetti elements
         const confettiCanvas = document.getElementById('confettiCanvas');
         const confettiCtx = confettiCanvas.getContext('2d');
         let confettiAnimationId;
 
-        let wheelOptions = []; // Renamed to avoid conflict
-        const wheelColors = ['#1A3A5A', '#8A9A5B', '#FDFBF7', '#EAD3A2', '#5E7A4A', '#b3cde0', '#6497b1', '#005b96', '#03396c', '#011f4b']; // Renamed
+        let wheelOptions = [];
+        const wheelColors = ['#1A3A5A', '#8A9A5B', '#FDFBF7', '#EAD3A2', '#5E7A4A', '#b3cde0', '#6497b1', '#005b96', '#03396c', '#011f4b'];
         let startAngle = 0;
         let arc = 0;
         let spinTimeout = null;
-
         let spinAngleStart = 0;
         let spinTime = 0;
         let spinTimeTotal = 0;
-        
         let isSpinning = false;
 
         function drawWheel() {
             const numOptions = wheelOptions.length;
-            wheelCtx.clearRect(0, 0, wheelCanvas.width, wheelCanvas.height); // Clear canvas first
+            wheelCtx.clearRect(0, 0, wheelCanvas.width, wheelCanvas.height);
 
             if (numOptions === 0) {
-                 // Draw a placeholder state when no options are available
                  wheelCtx.save();
-                 wheelCtx.fillStyle = '#f3f4f6'; // gray-100
+                 wheelCtx.fillStyle = '#f3f4f6';
                  wheelCtx.beginPath();
                  wheelCtx.arc(250, 250, 250, 0, Math.PI * 2);
                  wheelCtx.fill();
-                 
-                 wheelCtx.fillStyle = '#9ca3af'; // gray-400
+                 wheelCtx.fillStyle = '#9ca3af';
                  wheelCtx.font = 'bold 20px Poppins, sans-serif';
                  wheelCtx.textAlign = 'center';
                  wheelCtx.fillText('Add options to spin!', 250, 250);
@@ -841,22 +961,18 @@
             }
             
             arc = Math.PI * 2 / numOptions;
-            
             wheelCtx.strokeStyle = '#ccc';
             wheelCtx.lineWidth = 2;
-            
             wheelCtx.font = 'bold 16px Poppins, sans-serif';
 
             for (let i = 0; i < numOptions; i++) {
                 const angle = startAngle + i * arc;
                 wheelCtx.fillStyle = wheelColors[i % wheelColors.length];
-
                 wheelCtx.beginPath();
                 wheelCtx.arc(250, 250, 250, angle, angle + arc, false);
                 wheelCtx.arc(250, 250, 0, angle + arc, angle, true);
                 wheelCtx.stroke();
                 wheelCtx.fill();
-
                 wheelCtx.save();
                 wheelCtx.fillStyle = (i % 4 === 2) ? '#333' : 'white';
                 wheelCtx.translate(250 + Math.cos(angle + arc / 2) * 180, 250 + Math.sin(angle + arc / 2) * 180);
@@ -884,22 +1000,19 @@
                 const li = document.createElement('li');
                 li.className = 'flex justify-between items-center bg-gray-100 p-2 rounded-md';
                 li.textContent = option;
-                
                 const removeBtn = document.createElement('button');
                 removeBtn.innerHTML = '&times;';
                 removeBtn.className = 'font-bold text-red-500 hover:text-red-700 ml-2';
-                removeBtn.onclick = () => removeWheelOption(index); // Renamed
-                
+                removeBtn.onclick = () => removeWheelOption(index);
                 li.appendChild(removeBtn);
                 optionsList.appendChild(li);
             });
             spinBtn.disabled = wheelOptions.length < 2;
         }
 
-        function addWheelOption() { // Renamed
+        function addWheelOption() {
             const newOption = optionInput.value.trim();
             errorMessage.textContent = '';
-
             if (newOption) {
                 if (wheelOptions.length >= 10) {
                     errorMessage.textContent = 'Maximum of 10 options allowed.';
@@ -912,7 +1025,7 @@
             }
         }
         
-        function removeWheelOption(indexToRemove) { // Renamed
+        function removeWheelOption(indexToRemove) {
             wheelOptions.splice(indexToRemove, 1);
             updateOptionsList();
             drawWheel();
@@ -935,7 +1048,6 @@
             const degrees = startAngle * 180 / Math.PI + 90;
             const arcd = arc * 180 / Math.PI;
             const winnerIndex = Math.floor((360 - degrees % 360) / arcd);
-            
             showWinnerModal(wheelOptions[winnerIndex], winnerIndex);
         }
 
@@ -945,14 +1057,13 @@
             return b + c * (tc + -3 * ts + 3 * t);
         }
         
-        function spinWheel() { // Renamed
+        function spinWheel() {
             if (isSpinning || wheelOptions.length < 2) return;
             isSpinning = true;
             spinBtn.disabled = true;
-
             spinAngleStart = Math.random() * 10 + 10;
             spinTime = 0;
-            spinTimeTotal = Math.random() * 3000 + 4000; // 4-7 seconds spin
+            spinTimeTotal = Math.random() * 3000 + 4000;
             rotateWheel();
         }
         
@@ -961,14 +1072,8 @@
             winnerModal.classList.remove('modal-hidden');
             winnerModal.classList.add('modal-visible');
             startConfetti();
-
-            function handleRemove() {
-                removeWheelOption(index);
-                cleanup();
-            }
-            function handleKeep() {
-                cleanup();
-            }
+            function handleRemove() { removeWheelOption(index); cleanup(); }
+            function handleKeep() { cleanup(); }
             function cleanup() {
                 winnerModal.classList.add('modal-hidden');
                 winnerModal.classList.remove('modal-visible');
@@ -978,43 +1083,31 @@
                 removeWinnerBtn.removeEventListener('click', handleRemove);
                 keepWinnerBtn.removeEventListener('click', handleKeep);
             }
-
             removeWinnerBtn.addEventListener('click', handleRemove, { once: true });
             keepWinnerBtn.addEventListener('click', handleKeep, { once: true });
         }
 
-
-        // --- Confetti Logic ---
         let particles = [];
         function startConfetti() {
             confettiCanvas.width = window.innerWidth;
             confettiCanvas.height = window.innerHeight;
             particles = [];
-            const particleCount = 200;
-            for (let i = 0; i < particleCount; i++) {
-                particles.push(new Particle());
-            }
+            for (let i = 0; i < 200; i++) { particles.push(new Particle()); }
             confettiLoop();
         }
-
         function stopConfetti() {
             particles = [];
             cancelAnimationFrame(confettiAnimationId);
         }
-
         function confettiLoop() {
             confettiAnimationId = requestAnimationFrame(confettiLoop);
             confettiCtx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
-
             particles.forEach((particle, index) => {
                 particle.update();
                 particle.draw();
-                if (particle.y > confettiCanvas.height) {
-                    particles.splice(index, 1);
-                }
+                if (particle.y > confettiCanvas.height) particles.splice(index, 1);
             });
         }
-        
         class Particle {
             constructor() {
                 this.x = Math.random() * confettiCanvas.width;
@@ -1043,23 +1136,16 @@
                 confettiCtx.restore();
             }
         }
-
         addOptionBtn.addEventListener('click', addWheelOption);
-        optionInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                addWheelOption();
-            }
-        });
+        optionInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') addWheelOption(); });
         spinBtn.addEventListener('click', spinWheel);
-
-        // Initial state for the wheel
         updateOptionsList();
         drawWheel();
-
     </script>
-
 </body>
 </html>
+
+
 
 
 
