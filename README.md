@@ -1,3 +1,4 @@
+
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -107,6 +108,32 @@
         }
         .remove-event:hover {
             opacity: 1;
+        }
+        /* Winner Modal Styles from Spin the Wheel */
+        .modal-hidden {
+            display: none;
+        }
+        .modal-visible {
+            display: flex;
+        }
+        #modalContent {
+            animation: scaleUp 0.5s cubic-bezier(0.165, 0.840, 0.440, 1.000) forwards;
+        }
+        @keyframes scaleUp {
+            0% { transform: scale(0.8); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .pointer {
+            width: 0;
+            height: 0;
+            border-left: 20px solid transparent;
+            border-right: 20px solid transparent;
+            border-top: 30px solid #dc2626; /* red-600 */
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10;
         }
     </style>
 </head>
@@ -440,6 +467,39 @@
             </div>
         </section>
 
+        <!-- NEW Section: Spin the Wheel Decision Maker -->
+        <section class="section-card">
+            <h2 class="text-2xl font-bold text-center mb-1">Spin for Fun!</h2>
+            <p class="text-center text-gray-500 mb-8">Can't decide on a date night? Let the wheel choose.</p>
+            <div class="grid md:grid-cols-2 gap-8 items-start">
+                <!-- Wheel Controls & Options -->
+                <div>
+                    <div class="bg-gray-50 p-4 rounded-lg mb-4">
+                        <h3 class="font-bold text-lg mb-3 text-center">Add Your Choices</h3>
+                        <div class="flex space-x-2">
+                            <input type="text" id="optionInput" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-[#1A3A5A] focus:ring-[#1A3A5A] sm:text-sm" placeholder="e.g., Movie Night">
+                            <button id="addOptionBtn" class="bg-navy text-white font-bold py-2 px-4 rounded-md hover:bg-navy/90 transition-colors flex-shrink-0">Add</button>
+                        </div>
+                        <p id="error-message" class="text-red-500 text-sm mt-2 text-center h-4"></p>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <h3 class="font-bold text-lg mb-3 text-center">Current Options</h3>
+                        <ul id="optionsList" class="space-y-2 text-sm max-h-48 overflow-y-auto">
+                            <!-- Options will be dynamically added here -->
+                        </ul>
+                    </div>
+                </div>
+                <!-- Wheel Canvas -->
+                <div class="flex flex-col items-center justify-center space-y-4">
+                     <div class="relative">
+                        <div class="pointer"></div>
+                        <canvas id="wheelCanvas" width="500" height="500" class="max-w-xs w-full"></canvas>
+                    </div>
+                    <button id="spinBtn" class="bg-sage text-white text-xl font-bold py-3 px-10 rounded-full hover:bg-sage/90 transition-colors shadow-lg disabled:bg-gray-400 disabled:cursor-not-allowed">SPIN</button>
+                </div>
+            </div>
+        </section>
+
 
         <!-- Footer -->
         <footer class="text-center mt-4 mb-8">
@@ -448,8 +508,22 @@
 
     </div>
 
+    <!-- Winner Modal from Spin the Wheel -->
+    <div id="winnerModal" class="fixed inset-0 bg-black bg-opacity-60 items-center justify-center z-50 modal-hidden">
+        <canvas id="confettiCanvas" class="absolute top-0 left-0 w-full h-full pointer-events-none"></canvas>
+        <div id="modalContent" class="bg-white p-8 rounded-2xl shadow-xl text-center transform transition-all max-w-sm w-full mx-4">
+            <p class="text-gray-500 text-lg">The winner is...</p>
+            <h2 id="winnerText" class="text-4xl font-bold text-navy my-4 break-words"></h2>
+            <div class="space-y-3 mt-6">
+                <button id="removeWinnerBtn" class="bg-red-500 text-white font-bold py-2 px-6 rounded-lg w-full hover:bg-red-600 transition-colors">Remove & Spin Again</button>
+                <button id="keepWinnerBtn" class="bg-gray-300 text-gray-800 font-bold py-2 px-6 rounded-lg w-full hover:bg-gray-400 transition-colors">Keep & Close</button>
+            </div>
+        </div>
+    </div>
+
+
     <script>
-        // Chart.js Logic
+        // Chart.js Logic (from infographic)
         const ctx = document.getElementById('timeTogetherChart').getContext('2d');
         const flexSlider = document.getElementById('flex-slider');
         const flexNightsValue = document.getElementById('flex-nights-value');
@@ -607,141 +681,10 @@
                 e.target.parentElement.remove();
             }
         });
-
-        <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Spin the Wheel Decision Maker</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Poppins', sans-serif;
-            background-color: #FDFBF7;
-            color: #333;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            min-height: 100vh;
-            padding: 1rem;
-        }
-        .container {
-            display: grid;
-            grid-template-areas:
-                "title title"
-                "controls wheel"
-                "options wheel";
-            grid-template-columns: 300px 1fr;
-            grid-template-rows: auto 1fr auto;
-            gap: 2rem;
-            max-width: 1000px;
-            width: 100%;
-        }
-        @media (max-width: 768px) {
-            .container {
-                grid-template-areas:
-                    "title"
-                    "wheel"
-                    "controls"
-                    "options";
-                grid-template-columns: 1fr;
-                grid-template-rows: auto;
-            }
-        }
-        .section-card {
-            background-color: white;
-            border-radius: 1.5rem;
-            padding: 1.5rem;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.04);
-            border: 1px solid #F0EFEA;
-        }
-        #wheelCanvas {
-            max-width: 500px;
-            width: 100%;
-            aspect-ratio: 1 / 1;
-        }
-        .pointer {
-            width: 0;
-            height: 0;
-            border-left: 20px solid transparent;
-            border-right: 20px solid transparent;
-            border-top: 30px solid #dc2626; /* red-600 */
-            position: absolute;
-            top: -10px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 10;
-        }
-        /* Winner Modal Styles */
-        .modal-hidden {
-            display: none;
-        }
-        .modal-visible {
-            display: flex;
-        }
-        #modalContent {
-            animation: scaleUp 0.5s cubic-bezier(0.165, 0.840, 0.440, 1.000) forwards;
-        }
-        @keyframes scaleUp {
-            0% { transform: scale(0.8); opacity: 0; }
-            100% { transform: scale(1); opacity: 1; }
-        }
-    </style>
-</head>
-<body class="antialiased">
-
-    <div class="container">
-        <header style="grid-area: title;" class="text-center">
-            <h1 class="text-3xl md:text-4xl font-bold text-[#1A3A5A]">Spin the Wheel!</h1>
-            <p class="text-gray-500 mt-1">Add up to 10 options and find your winner.</p>
-        </header>
-
-        <div style="grid-area: controls;" class="section-card">
-            <h2 class="font-bold text-lg mb-4 text-center">Add Your Choices</h2>
-            <div class="flex space-x-2">
-                <input type="text" id="optionInput" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-[#1A3A5A] focus:ring-[#1A3A5A] sm:text-sm" placeholder="e.g., Movie Night">
-                <button id="addOptionBtn" class="bg-[#1A3A5A] text-white font-bold py-2 px-4 rounded-md hover:bg-[#1A3A5A]/90 transition-colors flex-shrink-0">Add</button>
-            </div>
-            <p id="error-message" class="text-red-500 text-sm mt-2 text-center"></p>
-        </div>
-
-        <div style="grid-area: options;" class="section-card">
-            <h2 class="font-bold text-lg mb-4 text-center">Current Options</h2>
-            <ul id="optionsList" class="space-y-2 text-sm">
-                <!-- Options will be dynamically added here -->
-            </ul>
-        </div>
         
-        <div style="grid-area: wheel;" class="flex flex-col items-center justify-center space-y-4">
-             <div class="relative">
-                <div class="pointer"></div>
-                <canvas id="wheelCanvas" width="500" height="500"></canvas>
-            </div>
-            <button id="spinBtn" class="bg-[#8A9A5B] text-white text-xl font-bold py-3 px-10 rounded-full hover:bg-[#8A9A5B]/90 transition-colors shadow-lg disabled:bg-gray-400 disabled:cursor-not-allowed">SPIN</button>
-        </div>
-    </div>
-    
-    <!-- Winner Modal -->
-    <div id="winnerModal" class="fixed inset-0 bg-black bg-opacity-60 items-center justify-center z-50 modal-hidden">
-        <canvas id="confettiCanvas" class="absolute top-0 left-0 w-full h-full pointer-events-none"></canvas>
-        <div id="modalContent" class="bg-white p-8 rounded-2xl shadow-xl text-center transform transition-all max-w-sm w-full mx-4">
-            <p class="text-gray-500 text-lg">The winner is...</p>
-            <h2 id="winnerText" class="text-4xl font-bold text-[#1A3A5A] my-4 break-words"></h2>
-            <div class="space-y-3 mt-6">
-                <button id="removeWinnerBtn" class="bg-red-500 text-white font-bold py-2 px-6 rounded-lg w-full hover:bg-red-600 transition-colors">Remove & Spin Again</button>
-                <button id="keepWinnerBtn" class="bg-gray-300 text-gray-800 font-bold py-2 px-6 rounded-lg w-full hover:bg-gray-400 transition-colors">Keep & Close</button>
-            </div>
-        </div>
-    </div>
-
-
-    <script>
+        // --- Spin the Wheel Logic ---
         const wheelCanvas = document.getElementById('wheelCanvas');
-        const ctx = wheelCanvas.getContext('2d');
+        const wheelCtx = wheelCanvas.getContext('2d'); // Renamed to avoid conflict
         const spinBtn = document.getElementById('spinBtn');
         const optionInput = document.getElementById('optionInput');
         const addOptionBtn = document.getElementById('addOptionBtn');
@@ -759,8 +702,8 @@
         const confettiCtx = confettiCanvas.getContext('2d');
         let confettiAnimationId;
 
-        let options = [];
-        const colors = ['#1A3A5A', '#8A9A5B', '#FDFBF7', '#EAD3A2', '#5E7A4A', '#b3cde0', '#6497b1', '#005b96', '#03396c', '#011f4b'];
+        let wheelOptions = []; // Renamed to avoid conflict
+        const wheelColors = ['#1A3A5A', '#8A9A5B', '#FDFBF7', '#EAD3A2', '#5E7A4A', '#b3cde0', '#6497b1', '#005b96', '#03396c', '#011f4b']; // Renamed
         let startAngle = 0;
         let arc = 0;
         let spinTimeout = null;
@@ -772,53 +715,53 @@
         let isSpinning = false;
 
         function drawWheel() {
-            const numOptions = options.length;
+            const numOptions = wheelOptions.length;
             if (numOptions === 0) {
-                 ctx.clearRect(0, 0, wheelCanvas.width, wheelCanvas.height);
+                 wheelCtx.clearRect(0, 0, wheelCanvas.width, wheelCanvas.height);
                  return;
             }
             arc = Math.PI * 2 / numOptions;
             
-            ctx.clearRect(0, 0, wheelCanvas.width, wheelCanvas.height);
-            ctx.strokeStyle = '#ccc';
-            ctx.lineWidth = 2;
+            wheelCtx.clearRect(0, 0, wheelCanvas.width, wheelCanvas.height);
+            wheelCtx.strokeStyle = '#ccc';
+            wheelCtx.lineWidth = 2;
             
-            ctx.font = 'bold 16px Poppins, sans-serif';
+            wheelCtx.font = 'bold 16px Poppins, sans-serif';
 
             for (let i = 0; i < numOptions; i++) {
                 const angle = startAngle + i * arc;
-                ctx.fillStyle = colors[i % colors.length];
+                wheelCtx.fillStyle = wheelColors[i % wheelColors.length];
 
-                ctx.beginPath();
-                ctx.arc(250, 250, 250, angle, angle + arc, false);
-                ctx.arc(250, 250, 0, angle + arc, angle, true);
-                ctx.stroke();
-                ctx.fill();
+                wheelCtx.beginPath();
+                wheelCtx.arc(250, 250, 250, angle, angle + arc, false);
+                wheelCtx.arc(250, 250, 0, angle + arc, angle, true);
+                wheelCtx.stroke();
+                wheelCtx.fill();
 
-                ctx.save();
-                ctx.fillStyle = (i % 4 === 2) ? '#333' : 'white';
-                ctx.translate(250 + Math.cos(angle + arc / 2) * 180, 250 + Math.sin(angle + arc / 2) * 180);
-                ctx.rotate(angle + arc / 2 + Math.PI / 2);
-                const text = options[i];
+                wheelCtx.save();
+                wheelCtx.fillStyle = (i % 4 === 2) ? '#333' : 'white';
+                wheelCtx.translate(250 + Math.cos(angle + arc / 2) * 180, 250 + Math.sin(angle + arc / 2) * 180);
+                wheelCtx.rotate(angle + arc / 2 + Math.PI / 2);
+                const text = wheelOptions[i];
                 const maxTextWidth = 120;
                 let displayText = text;
-                if(ctx.measureText(text).width > maxTextWidth) {
-                    while(ctx.measureText(displayText + '...').width > maxTextWidth && displayText.length > 0) {
+                if(wheelCtx.measureText(text).width > maxTextWidth) {
+                    while(wheelCtx.measureText(displayText + '...').width > maxTextWidth && displayText.length > 0) {
                         displayText = displayText.slice(0, -1);
                     }
                     displayText += '...';
                 }
-                ctx.fillText(displayText, -ctx.measureText(displayText).width / 2, 0);
-                ctx.restore();
+                wheelCtx.fillText(displayText, -wheelCtx.measureText(displayText).width / 2, 0);
+                wheelCtx.restore();
             }
         }
         
         function updateOptionsList() {
             optionsList.innerHTML = '';
-            if (options.length === 0) {
+            if (wheelOptions.length === 0) {
                  optionsList.innerHTML = '<li class="text-gray-400 text-center">No options yet!</li>';
             }
-            options.forEach((option, index) => {
+            wheelOptions.forEach((option, index) => {
                 const li = document.createElement('li');
                 li.className = 'flex justify-between items-center bg-gray-100 p-2 rounded-md';
                 li.textContent = option;
@@ -826,32 +769,32 @@
                 const removeBtn = document.createElement('button');
                 removeBtn.innerHTML = '&times;';
                 removeBtn.className = 'font-bold text-red-500 hover:text-red-700 ml-2';
-                removeBtn.onclick = () => removeOption(index);
+                removeBtn.onclick = () => removeWheelOption(index); // Renamed
                 
                 li.appendChild(removeBtn);
                 optionsList.appendChild(li);
             });
-            spinBtn.disabled = options.length < 2;
+            spinBtn.disabled = wheelOptions.length < 2;
         }
 
-        function addOption() {
+        function addWheelOption() { // Renamed
             const newOption = optionInput.value.trim();
             errorMessage.textContent = '';
 
             if (newOption) {
-                if (options.length >= 10) {
+                if (wheelOptions.length >= 10) {
                     errorMessage.textContent = 'Maximum of 10 options allowed.';
                     return;
                 }
-                options.push(newOption);
+                wheelOptions.push(newOption);
                 optionInput.value = '';
                 updateOptionsList();
                 drawWheel();
             }
         }
         
-        function removeOption(indexToRemove) {
-            options.splice(indexToRemove, 1);
+        function removeWheelOption(indexToRemove) { // Renamed
+            wheelOptions.splice(indexToRemove, 1);
             updateOptionsList();
             drawWheel();
         }
@@ -874,7 +817,7 @@
             const arcd = arc * 180 / Math.PI;
             const winnerIndex = Math.floor((360 - degrees % 360) / arcd);
             
-            showWinnerModal(options[winnerIndex], winnerIndex);
+            showWinnerModal(wheelOptions[winnerIndex], winnerIndex);
         }
 
         function easeOut(t, b, c, d) {
@@ -883,8 +826,8 @@
             return b + c * (tc + -3 * ts + 3 * t);
         }
         
-        function spin() {
-            if (isSpinning || options.length < 2) return;
+        function spinWheel() { // Renamed
+            if (isSpinning || wheelOptions.length < 2) return;
             isSpinning = true;
             spinBtn.disabled = true;
 
@@ -901,7 +844,7 @@
             startConfetti();
 
             function handleRemove() {
-                removeOption(index);
+                removeWheelOption(index);
                 cleanup();
             }
             function handleKeep() {
@@ -911,7 +854,7 @@
                 winnerModal.classList.add('modal-hidden');
                 winnerModal.classList.remove('modal-visible');
                 isSpinning = false;
-                spinBtn.disabled = options.length < 2;
+                spinBtn.disabled = wheelOptions.length < 2;
                 stopConfetti();
                 removeWinnerBtn.removeEventListener('click', handleRemove);
                 keepWinnerBtn.removeEventListener('click', handleKeep);
@@ -960,7 +903,7 @@
                 this.size = Math.random() * 10 + 5;
                 this.speed = Math.random() * 5 + 2;
                 this.gravity = 0.1;
-                this.color = colors[Math.floor(Math.random() * colors.length)];
+                this.color = wheelColors[Math.floor(Math.random() * wheelColors.length)];
                 this.opacity = 1;
                 this.angle = Math.random() * Math.PI * 2;
                 this.spin = (Math.random() - 0.5) * 0.2;
@@ -982,24 +925,21 @@
             }
         }
 
-        addOptionBtn.addEventListener('click', addOption);
+        addOptionBtn.addEventListener('click', addWheelOption);
         optionInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') {
-                addOption();
+                addWheelOption();
             }
         });
-        spinBtn.addEventListener('click', spin);
+        spinBtn.addEventListener('click', spinWheel);
 
-        // Initial state
+        // Initial state for the wheel
         updateOptionsList();
         drawWheel();
-    </script>
-</body>
-</html>
-
-
 
     </script>
 
 </body>
 </html>
+
+
