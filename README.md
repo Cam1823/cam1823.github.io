@@ -10,6 +10,9 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
     <style>
+        html {
+            scroll-behavior: smooth;
+        }
         body {
             font-family: 'Poppins', sans-serif;
             background-color: #FDFBF7; /* Warm Cream */
@@ -36,6 +39,65 @@
         .text-sage { color: #8A9A5B; }
         .bg-cream { background-color: #FDFBF7; }
         .text-cream { color: #FDFBF7; }
+
+        /* Nav Menu Styles */
+        #menu-button {
+            position: fixed;
+            top: 1rem;
+            left: 1rem;
+            z-index: 100;
+            background-color: white;
+            border-radius: 9999px;
+            padding: 0.75rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            transition: all 0.2s ease-in-out;
+        }
+        #menu-button:hover {
+            transform: scale(1.1);
+        }
+        #nav-menu {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 280px;
+            background-color: #1A3A5A;
+            z-index: 90;
+            transform: translateX(-100%);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            padding: 4rem 2rem 2rem;
+        }
+        #nav-menu.is-open {
+            transform: translateX(0);
+        }
+        .nav-link {
+            display: block;
+            padding: 0.75rem 1rem;
+            color: white;
+            font-weight: 600;
+            border-radius: 0.5rem;
+            transition: background-color 0.2s;
+        }
+        .nav-link:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        #page-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 80;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease-in-out;
+        }
+        #page-overlay.is-visible {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
 
         /* Custom styles for slider */
         input[type=range] {
@@ -139,6 +201,29 @@
 </head>
 <body class="antialiased">
 
+    <!-- Navigation Menu -->
+    <button id="menu-button" aria-label="Open navigation menu">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-navy" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
+        </svg>
+    </button>
+    <div id="page-overlay"></div>
+    <nav id="nav-menu">
+        <ul class="space-y-2">
+            <li><a href="#briefing" class="nav-link">Adventure Briefing</a></li>
+            <li><a href="#homes" class="nav-link">Our Two Homes</a></li>
+            <li><a href="#commute" class="nav-link">The Weekly Commute</a></li>
+            <li><a href="#weekly-life" class="nav-link">Our Weekly Life</a></li>
+            <li><a href="#planner" class="nav-link">Weekly Planner</a></li>
+            <li><a href="#flex-fund" class="nav-link">Flex Time Fund</a></li>
+            <li><a href="#numbers" class="nav-link">Year in Numbers</a></li>
+            <li><a href="#year-together" class="nav-link">Our Year Together</a></li>
+            <li><a href="#todos" class="nav-link">Next Steps</a></li>
+            <li><a href="#spinner" class="nav-link">Spin for Fun!</a></li>
+        </ul>
+    </nav>
+    
+
     <div class="max-w-4xl mx-auto p-4 md:p-8">
         
         <!-- Header -->
@@ -148,7 +233,7 @@
         </header>
         
         <!-- Section 1: The Adventure Briefing -->
-        <section class="section-card text-center bg-navy/5">
+        <section id="briefing" class="section-card text-center bg-navy/5">
             <h2 class="text-2xl font-bold text-center mb-6">The Adventure Briefing</h2>
             <p class="text-gray-700 max-w-2xl mx-auto lora-font italic">An executive summary of the year ahead, balancing city hustle with suburban calm, quality time with social fun, and planned routines with spontaneous adventures.</p>
             <div class="mt-6 grid grid-cols-2 md:grid-cols-4 gap-4 text-navy">
@@ -172,7 +257,7 @@
         </section>
 
         <!-- Section 2: Our Two Homes -->
-        <section class="section-card">
+        <section id="homes" class="section-card">
             <h2 class="text-2xl font-bold text-center mb-8">Our Two Homes</h2>
             <div class="grid md:grid-cols-2 gap-8 items-start">
                 <!-- Annapolis House -->
@@ -210,7 +295,7 @@
         </section>
 
         <!-- Section 3: The Weekly Commute -->
-        <section class="section-card">
+        <section id="commute" class="section-card">
             <h2 class="text-2xl font-bold text-center mb-8">The Weekly Commute: Train vs. Car</h2>
             <div class="grid md:grid-cols-2 gap-8">
                 <!-- Train Travel -->
@@ -253,7 +338,7 @@
         </section>
 
         <!-- Section 4: Our Weekly Life -->
-        <section class="section-card">
+        <section id="weekly-life" class="section-card">
             <h2 class="text-2xl font-bold text-center mb-8">Our Weekly Life</h2>
             <div class="flex justify-center items-center space-x-4 md:space-x-8 mb-10 text-center">
                 <div class="font-semibold">
@@ -279,7 +364,7 @@
         </section>
 
         <!-- NEW Section: Weekly Calendar -->
-        <section class="section-card">
+        <section id="planner" class="section-card">
             <h2 class="text-2xl font-bold text-center mb-8">Our Weekly Planner</h2>
             <div id="add-event-form" class="mb-8 p-6 bg-gray-50 rounded-lg">
                 <h3 class="font-bold text-lg mb-4 text-center">Add a New Event</h3>
@@ -345,7 +430,7 @@
         </section>
         
         <!-- Section 5: Our "Flex Time" Fund -->
-        <section class="section-card">
+        <section id="flex-fund" class="section-card">
             <h2 class="text-2xl font-bold text-center mb-8">Our "Flex Time" Fund: Planning for the Unplanned</h2>
             <div class="grid md:grid-cols-2 gap-8 items-center">
                 <div class="relative w-48 h-64 bg-blue-100/30 rounded-t-full rounded-b-lg mx-auto border-4 border-navy p-2 flex flex-col-reverse items-center">
@@ -380,7 +465,7 @@
         </section>
 
         <!-- Section 6: Our Year in Numbers -->
-        <section class="section-card bg-navy text-white text-center">
+        <section id="numbers" class="section-card bg-navy text-white text-center">
              <h2 class="text-2xl font-bold text-center mb-8">Our Year in Numbers</h2>
              <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                  <div>
@@ -403,7 +488,7 @@
         </section>
         
         <!-- Section 7: Our Year Together: A Detailed Look -->
-        <section class="section-card">
+        <section id="year-together" class="section-card">
             <h2 class="text-2xl font-bold text-center mb-8">Our Year Together: A Detailed Look</h2>
             <div class="w-full max-w-sm mx-auto relative">
                 <canvas id="timeTogetherChart"></canvas>
@@ -441,7 +526,7 @@
         </section>
 
         <!-- Section 8: Next Steps & To-Dos -->
-        <section class="section-card">
+        <section id="todos" class="section-card">
             <h2 class="text-2xl font-bold text-center mb-8">Next Steps & To-Dos</h2>
             <div id="todo-list" class="space-y-4 max-w-md mx-auto">
                 <div class="flex items-center">
@@ -468,7 +553,7 @@
         </section>
 
         <!-- NEW Section: Spin the Wheel Decision Maker -->
-        <section class="section-card">
+        <section id="spinner" class="section-card">
             <h2 class="text-2xl font-bold text-center mb-1">Spin for Fun!</h2>
             <p class="text-center text-gray-500 mb-8">Can't decide on a date night? Let the wheel choose.</p>
             <div class="grid md:grid-cols-2 gap-8 items-start">
@@ -523,6 +608,27 @@
 
 
     <script>
+        // --- Navigation Menu Logic ---
+        const menuButton = document.getElementById('menu-button');
+        const navMenu = document.getElementById('nav-menu');
+        const pageOverlay = document.getElementById('page-overlay');
+        const navLinks = document.querySelectorAll('.nav-link');
+
+        function toggleMenu() {
+            navMenu.classList.toggle('is-open');
+            pageOverlay.classList.toggle('is-visible');
+        }
+
+        menuButton.addEventListener('click', toggleMenu);
+        pageOverlay.addEventListener('click', toggleMenu);
+        navLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                if (navMenu.classList.contains('is-open')) {
+                    toggleMenu();
+                }
+            });
+        });
+
         // Chart.js Logic (from infographic)
         const ctx = document.getElementById('timeTogetherChart').getContext('2d');
         const flexSlider = document.getElementById('flex-slider');
@@ -716,13 +822,26 @@
 
         function drawWheel() {
             const numOptions = wheelOptions.length;
+            wheelCtx.clearRect(0, 0, wheelCanvas.width, wheelCanvas.height); // Clear canvas first
+
             if (numOptions === 0) {
-                 wheelCtx.clearRect(0, 0, wheelCanvas.width, wheelCanvas.height);
+                 // Draw a placeholder state when no options are available
+                 wheelCtx.save();
+                 wheelCtx.fillStyle = '#f3f4f6'; // gray-100
+                 wheelCtx.beginPath();
+                 wheelCtx.arc(250, 250, 250, 0, Math.PI * 2);
+                 wheelCtx.fill();
+                 
+                 wheelCtx.fillStyle = '#9ca3af'; // gray-400
+                 wheelCtx.font = 'bold 20px Poppins, sans-serif';
+                 wheelCtx.textAlign = 'center';
+                 wheelCtx.fillText('Add options to spin!', 250, 250);
+                 wheelCtx.restore();
                  return;
             }
+            
             arc = Math.PI * 2 / numOptions;
             
-            wheelCtx.clearRect(0, 0, wheelCanvas.width, wheelCanvas.height);
             wheelCtx.strokeStyle = '#ccc';
             wheelCtx.lineWidth = 2;
             
@@ -941,6 +1060,8 @@
 
 </body>
 </html>
+
+
 
 
 
