@@ -1,7 +1,3 @@
-# cam1823.github.io
-Lauren and Cam Planning Site
-
-<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
